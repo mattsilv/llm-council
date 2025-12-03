@@ -161,3 +161,28 @@
   background: #ccc;
   border-color: #ccc;
 }
+
+.download-section {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 16px;
+}
+
+.download-button {
+  padding: 10px 20px;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid #4a90e2;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #4a90e2;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.download-button:hover {
+  background: #4a90e2;
+  color: #fff;
+}

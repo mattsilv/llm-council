@@ -37,6 +37,72 @@ export default function ChatInterface({
     }
   };
 
+  const generateMarkdown = () => {
+    if (!conversation || conversation.messages.length === 0) return '';
+
+    let md = `# LLM Council Deliberation\n\n`;
+    md += `**Title:** ${conversation.title || 'Untitled'}\n`;
+    md += `**Date:** ${new Date(conversation.created_at).toLocaleString()}\n\n`;
+    md += `---\n\n`;
+
+    conversation.messages.forEach((msg, index) => {
+      if (msg.role === 'user') {
+        md += `## User Query\n\n${msg.content}\n\n`;
+      } else {
+        // Stage 1
+        if (msg.stage1) {
+          md += `## Stage 1: Individual Responses\n\n`;
+          msg.stage1.forEach((resp) => {
+            const modelName = resp.model.split('/')[1] || resp.model;
+            md += `### ${modelName}\n\n${resp.response}\n\n`;
+          });
+        }
+
+        // Stage 2
+        if (msg.stage2) {
+          md += `## Stage 2: Peer Rankings\n\n`;
+          if (msg.metadata?.aggregate_rankings) {
+            md += `### Aggregate Rankings\n\n`;
+            msg.metadata.aggregate_rankings.forEach((r, i) => {
+              md += `${i + 1}. **${r.model.split('/')[1] || r.model}** (avg rank: ${r.average_rank.toFixed(2)})\n`;
+            });
+            md += `\n`;
+          }
+          msg.stage2.forEach((ranking) => {
+            const modelName = ranking.model.split('/')[1] || ranking.model;
+            md += `### Evaluation by ${modelName}\n\n${ranking.ranking}\n\n`;
+          });
+        }
+
+        // Stage 3
+        if (msg.stage3) {
+          md += `## Stage 3: Final Council Answer\n\n`;
+          const chairmanName = msg.stage3.model.split('/')[1] || msg.stage3.model;
+          md += `**Chairman:** ${chairmanName}\n\n`;
+          md += `${msg.stage3.response}\n\n`;
+        }
+
+        md += `---\n\n`;
+      }
+    });
+
+    return md;
+  };
+
+  const handleDownload = () => {
+    const markdown = generateMarkdown();
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const title = conversation?.title?.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'council-deliberation';
+    a.download = `${title}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (!conversation) {
     return (
       <div className="chat-interface">
@@ -114,6 +180,14 @@ export default function ChatInterface({
           <div className="loading-indicator">
             <div className="spinner"></div>
             <span>Consulting the council...</span>
+          </div>
+        )}
+
+        {conversation.messages.length > 0 && !isLoading && (
+          <div className="download-section">
+            <button className="download-button" onClick={handleDownload}>
+              📥 Download as Markdown
+            </button>
           </div>
         )}
 

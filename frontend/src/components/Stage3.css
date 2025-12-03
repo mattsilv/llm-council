@@ -3,6 +3,39 @@
   border-color: #c8e6c8;
 }
 
+.stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.stage-header .stage-title {
+  margin-bottom: 0;
+}
+
+.copy-button {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #fff;
+  border: 1px solid #c8e6c8;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #2d8a2d;
+  transition: all 0.2s;
+}
+
+.copy-button:hover {
+  background: #e8f5e8;
+  border-color: #2d8a2d;
+}
+
+.copy-button.copied {
+  background: #2d8a2d;
+  color: #fff;
+  border-color: #2d8a2d;
+}
+
 .final-response {
   background: #ffffff;
   padding: 20px;
